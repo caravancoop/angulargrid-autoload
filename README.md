@@ -1,7 +1,7 @@
 angulargrid
 ===========
 
-Pinterest like responsive masonry grid system for angular
+Pinterest like responsive masonry grid system for angular based on based on angulargrid https://github.com/s-yadav/angulargrid
 
 ##Features
 <ul>
@@ -17,7 +17,6 @@ Demo url : http://ignitersworld.com/lab/angulargrid/index.html#demo
 
 Documentation url : http://ignitersworld.com/lab/angulargrid/index.html#documentation
 
-##Updates
 ###Release 0.6.0 :
 UMD Support Added
 
