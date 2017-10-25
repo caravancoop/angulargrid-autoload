@@ -304,11 +304,12 @@
                 if (scrollNs.isFull){
                     clearTimeout(scrollNs.loadViewTimeout)
                 }
-                if (scrollNs.isLoading || !scope.model.length) return;
+                if (scrollNs.isLoading || !scope.model.length) return
+                var containerInfo = getScrollContainerInfo();
+                var scrollHeight = containerInfo.scrollHeight
                 var contHeight = $("post").last().position().top;
-                var scrollHeight = scrollNs.scrollContInfo.scrollHeight
-                
-                if ( scrollTop >= (contHeight * ( options.infiniteScrollDistance / 100))) {
+                var windowHeight = containerInfo.height;
+                if ( scrollTop > (contHeight - ( options.infiniteScrollDistance * windowHeight))) {
                      scrollNs.isLoading = true;
                      scope.infiniteScroll();
                      scrollNs.infiniteScrollTimeout = setTimeout(reEnableInfiniteScroll, options.infiniteScrollDelay);
