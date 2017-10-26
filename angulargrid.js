@@ -309,10 +309,11 @@
                 var scrollHeight = containerInfo.scrollHeight
                 var contHeight = $("post").last().position().top;
                 var windowHeight = containerInfo.height;
-                if ( scrollTop > (contHeight - ( options.infiniteScrollDistance * windowHeight))) {
+                var target = (contHeight - ( options.infiniteScrollDistance * windowHeight));
+                if ( scrollTop > target || (target < 0 && scrollTop < windowHeight)) {
                      scrollNs.isLoading = true;
                      scope.infiniteScroll();
-                     scrollNs.infiniteScrollTimeout = setTimeout(reEnableInfiniteScroll, options.infiniteScrollDelay);
+                     scrollNs.infiniteScrollTimeout = setTimeout(reEnableInfiniteScroll, 100);
                      scrollNs.isFull = false
                 }else{
                     scrollNs.isFull = true
@@ -344,9 +345,12 @@
 
             //scroll event on scroll container element to refresh dom depending on scroll positions
             function scrollHandler() {
-              var scrollTop = this.scrollTop || this.scrollY;
-              if (options.performantScroll) refreshDomElm(scrollTop);
-              if (scope.infiniteScroll) infiniteScroll(scrollTop);
+              clearTimeout(scrollNs.scrolling);
+              scrollNs.scrolling = setTimeout( function(){
+                var scrollTop = this.scrollTop || this.scrollY;
+                if (options.performantScroll) refreshDomElm(scrollTop);
+                if (scope.infiniteScroll) {infiniteScroll(scrollTop);}
+                }, 150 );
             }
 
             setTimeout(function() {
