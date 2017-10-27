@@ -330,7 +330,7 @@
                 }else{
                     scrollNs.isFull = true
                 }
-                if (!scrollNs.isFull && !scrollNs.stillRender && !scrollNs.scrolling) {
+                if (!scrollNs.isFull && !scrollNs.stillRender) {
                     scrollNs.loadViewTimeout = setTimeout(function(){infiniteScroll(scrollTop)}, options.infiniteScrollDelay);
                 }
             }
@@ -366,7 +366,7 @@
                           }
                       }
                   });
-                }, 600 );
+                }, 100 );
             }
             //scroll event on scroll container element to refresh dom depending on scroll positions
             function scrollHandler() {
@@ -376,7 +376,7 @@
                 if (options.performantScroll) refreshDomElm(scrollTop);
                 if (scope.infiniteScroll) {infiniteScroll(scrollTop);}
                 renderImages();
-                }, 150 );
+                }, 100 );
             }
 
             setTimeout(function() {
