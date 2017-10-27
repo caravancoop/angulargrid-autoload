@@ -330,7 +330,7 @@
                 }else{
                     scrollNs.isFull = true
                 }
-                if (!scrollNs.isFull) {
+                if (!scrollNs.isFull && !scrollNs.stillRender && !scrollNs.scrolling) {
                     scrollNs.loadViewTimeout = setTimeout(function(){infiniteScroll(scrollTop)}, options.infiniteScrollDelay);
                 }
             }
@@ -354,19 +354,19 @@
             }
             
             /***** code for infiniteScroll end ******/
-
+            scrollNs.stillRender = null
             function renderImages() {
+              clearTimeout(scrollNs.stillRender);
+              scrollNs.stillRender = setTimeout( function(){
+                $('.angular-grid-thumbnail').attr('src','#');
                 $('.angular-grid-thumbnail').each(function(index){
-                    if(!isElementInSelectedViewport(this)){
-                        if (this.src != '#') {
-                            this.src = '#';
-                        }
-                    } else{
-                        if (this.src != this.dataset.imgsrc) {
-                            this.src = this.dataset.imgsrc;
-                        }
-                    }
-                });
+                      if(isElementInSelectedViewport(this)){
+                          if (this.src != this.dataset.imgsrc) {
+                              this.src = this.dataset.imgsrc;
+                          }
+                      }
+                  });
+                }, 600 );
             }
             //scroll event on scroll container element to refresh dom depending on scroll positions
             function scrollHandler() {
