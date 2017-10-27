@@ -300,6 +300,18 @@
 
             scrollNs.isFull = true
             scrollNs.loadViewTimeout = null
+            function isElementInSelectedViewport(el) {
+                var rect = el.getBoundingClientRect();
+                  var minTop = - Math.abs(window.innerHeight || document. documentElement.clientHeight) * options.infiniteScrollDistance;
+                  var minBottom =  Math.abs(minTop);
+                return (
+                  rect.top >= minTop &&
+                  rect.left >= 0 &&
+                  rect.bottom <= minBottom &&
+                  rect.right <= (window.innerWidth || document. documentElement.clientWidth)
+                );
+            }
+
             function infiniteScroll(scrollTop) {
                 if (scrollNs.isFull){
                     clearTimeout(scrollNs.loadViewTimeout)
@@ -324,7 +336,6 @@
             }
             
             
-            
             scrollNs.initScroll = function() {
                 var container = getScrollContainerInfo();
                 var bottomPos = $("post").last().position().top
@@ -332,10 +343,11 @@
                     scrollNs.loadViewTimeout = setTimeout(function()
                         {
                             if (container.height > bottomPos) {
-                               scrollNs.isLoading = true;
+                              scrollNs.isLoading = true;
                               scope.infiniteScroll();
                               scrollNs.infiniteScrollTimeout = setTimeout(reEnableInfiniteScroll, options.infiniteScrollDelay);
                               scrollNs.initScroll()
+                              renderImages()
                             }
                         }, 100);
                         scrollNs.loadViewTimeout
@@ -343,6 +355,19 @@
             
             /***** code for infiniteScroll end ******/
 
+            function renderImages() {
+                $('.angular-grid-thumbnail').each(function(index){
+                    if(!isElementInSelectedViewport(this)){
+                        if (this.src != '#') {
+                            this.src = '#';
+                        }
+                    } else{
+                        if (this.src != this.dataset.imgsrc) {
+                            this.src = this.dataset.imgsrc;
+                        }
+                    }
+                });
+            }
             //scroll event on scroll container element to refresh dom depending on scroll positions
             function scrollHandler() {
               clearTimeout(scrollNs.scrolling);
@@ -350,6 +375,7 @@
                 var scrollTop = this.scrollTop || this.scrollY;
                 if (options.performantScroll) refreshDomElm(scrollTop);
                 if (scope.infiniteScroll) {infiniteScroll(scrollTop);}
+                renderImages();
                 }, 150 );
             }
 

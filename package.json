@@ -1,6 +1,6 @@
 {
   "name": "angulargrid-autoload",
-  "version": "0.6.8",
+  "version": "0.6.9",
   "description": "Pinterest like responsive masonry grid system for angular based on angulargrid https://github.com/s-yadav/angulargrid",
   "keywords": [
     "angular-grid",
