@@ -338,8 +338,8 @@
                     renderImages()
                     scrollNs.isFull = true
                 }
-                
-                element.css('height', ($("post").last().position().top + containerHeight )+ 'px');
+                var lastItem = $("post").last()[0];
+                element.css('height', ($("post").last().position().top + lastItem.offsetHeight + 50 )+ 'px');
                 if (!scrollNs.isFull && !scrollNs.stillRender) {
                     scrollNs.loadViewTimeout = setTimeout(function(){infiniteScroll(scrollTop)}, options.infiniteScrollDelay);
                 }
@@ -734,7 +734,11 @@
             if (agId) {
               angularGridInstance[agId] = {
                 refresh: function() {
-                  watch();
+                    clearTimeout(scrollNs.loadViewTimeout);
+                    clearTimeout(scrollNs.stillRender);
+                    $('.angular-grid-next').removeClass('angular-grid-next__show');
+                    infiniteCount = 0;
+                    watch();
                 },
                 handleScroll: function(scrollTop) {
                   if (options.performantScroll) refreshDomElm(scrollTop);
