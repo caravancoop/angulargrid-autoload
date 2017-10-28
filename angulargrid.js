@@ -375,7 +375,7 @@
                           }
                       }
                   });
-                }, 300 );
+                }, 400 );
             }
             //scroll event on scroll container element to refresh dom depending on scroll positions
             function scrollHandler() {
@@ -384,8 +384,8 @@
                 var scrollTop = this.scrollTop || this.scrollY;
                 if (options.performantScroll) refreshDomElm(scrollTop);
                 if (scope.infiniteScroll) {infiniteScroll(scrollTop);}
-                }, 300 );
-              renderImages();
+                renderImages();
+                }, 100 );
             }
 
             setTimeout(function() {
