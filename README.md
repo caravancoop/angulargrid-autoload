@@ -3,6 +3,8 @@ angulargrid
 
 Pinterest like responsive masonry grid system for angular based on based on angulargrid https://github.com/s-yadav/angulargrid
 
+Modified for tests. You should not use it as it is.
+
 ##Features
 <ul>
     <li>Complete responsive, figures out columns and width to completely fit the container based on options provided and container width.</li>

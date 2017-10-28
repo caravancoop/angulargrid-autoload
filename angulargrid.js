@@ -37,6 +37,7 @@
     scrollContainer: 'body',
     infiniteScrollDelay: 3000,
     infiniteScrollDistance: 100,
+    infiniteCountMax: 10
   };
 
   var $ = angular.element;
@@ -112,14 +113,16 @@
             scrollContainer: '@agScrollContainer',
             infiniteScroll: '&agInfiniteScroll',
             infiniteScrollDistance: '=agInfiniteScrollDistance',
-            infiniteScrollDelay: '=agInfiniteScrollDelay'
+            infiniteScrollDelay: '=agInfiniteScrollDelay',
+            infiniteCountMax: '=agInfiniteCountMax'
           },
           link: function(scope, element, attrs) {
             var domElm = element[0],
               win = $($window),
               agId = scope.agId || scope.dep_agId, // angularGridId is deprecated
               listElms,
-              reflowCount = 0, //to keep tack of times reflowgrid been called
+              reflowCount = 0, //oto keep tack of times reflowgrid been called
+              infiniteCount = 0,
               timeoutPromise;
 
             element.addClass('angular-grid');
@@ -320,16 +323,23 @@
                 var containerInfo = getScrollContainerInfo();
                 var scrollHeight = containerInfo.scrollHeight
                 var contHeight = $("post").last().position().top;
-                var windowHeight = containerInfo.height;
-                var target = (contHeight - ( options.infiniteScrollDistance * windowHeight));
-                if ( scrollTop > target || (target < 0 && scrollTop < windowHeight)) {
+                var containerHeight = containerInfo.height;
+                var target = (contHeight - ( options.infiniteScrollDistance * containerHeight));
+                if ( (scrollTop > target || (target < 0 && scrollTop < containerHeight)) && infiniteCount < options.infiniteCountMax) {
+                     infiniteCount++;
                      scrollNs.isLoading = true;
                      scope.infiniteScroll();
                      scrollNs.infiniteScrollTimeout = setTimeout(reEnableInfiniteScroll, 100);
                      scrollNs.isFull = false
+                     
+                }else if(infiniteCount >= options.infiniteCountMax){
+                    $('.angular-grid-next').addClass('angular-grid-next__show');
                 }else{
+                    renderImages()
                     scrollNs.isFull = true
                 }
+                
+                element.css('height', ($("post").last().position().top + containerHeight )+ 'px');
                 if (!scrollNs.isFull && !scrollNs.stillRender) {
                     scrollNs.loadViewTimeout = setTimeout(function(){infiniteScroll(scrollTop)}, options.infiniteScrollDelay);
                 }
@@ -339,7 +349,6 @@
             scrollNs.initScroll = function() {
                 var container = getScrollContainerInfo();
                 var bottomPos = $("post").last().position().top
-                
                     scrollNs.loadViewTimeout = setTimeout(function()
                         {
                             if (container.height > bottomPos) {
@@ -366,7 +375,7 @@
                           }
                       }
                   });
-                }, 100 );
+                }, 300 );
             }
             //scroll event on scroll container element to refresh dom depending on scroll positions
             function scrollHandler() {
@@ -375,8 +384,8 @@
                 var scrollTop = this.scrollTop || this.scrollY;
                 if (options.performantScroll) refreshDomElm(scrollTop);
                 if (scope.infiniteScroll) {infiniteScroll(scrollTop);}
-                renderImages();
-                }, 100 );
+                }, 300 );
+              renderImages();
             }
 
             setTimeout(function() {
@@ -572,10 +581,7 @@
                       item.css(cssObj).addClass('angular-grid-item');
                     }
 
-                    //set the height of container
-                    var contHeight = Math.max.apply(Math, lastRowBottom);
-                    element.css('height', ($("post").last().position().top + 200 )+ 'px');
-
+                    
                     clones.remove();
 
                     //update the scroll container info
@@ -677,6 +683,7 @@
                   $timeout(function() {
                     //to handle scroll appearance
                     reflowGrids();
+                    renderImages();
                   });
                 });
               });
@@ -732,6 +739,17 @@
                 handleScroll: function(scrollTop) {
                   if (options.performantScroll) refreshDomElm(scrollTop);
                   if (scope.infiniteScroll) infiniteScroll(scrollTop);
+                },
+                reset: function(){
+                    var containerInfo = getScrollContainerInfo();
+                    clearTimeout(scrollNs.loadViewTimeout);
+                    clearTimeout(scrollNs.stillRender);
+                    reEnableInfiniteScroll()
+                    $('.angular-grid-next').removeClass('angular-grid-next__show');
+                    infiniteCount = 0;
+                    element.css('height', containerInfo.height + 'px');
+                    listElms = [];
+                    scrollNs.initScroll()
                 }
               };
             }
