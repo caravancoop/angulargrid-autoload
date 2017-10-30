@@ -37,7 +37,8 @@
     scrollContainer: 'body',
     infiniteScrollDelay: 3000,
     infiniteScrollDistance: 100,
-    infiniteCountMax: 10
+    infiniteCountMax: 10,
+    placeHolder: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
   };
 
   var $ = angular.element;
@@ -114,7 +115,8 @@
             infiniteScroll: '&agInfiniteScroll',
             infiniteScrollDistance: '=agInfiniteScrollDistance',
             infiniteScrollDelay: '=agInfiniteScrollDelay',
-            infiniteCountMax: '=agInfiniteCountMax'
+            infiniteCountMax: '=agInfiniteCountMax',
+            placeHolder: '=agPlaceHolder'
           },
           link: function(scope, element, attrs) {
             var domElm = element[0],
@@ -315,6 +317,20 @@
                 );
             }
 
+            function findLowestElmPosition(elms) {
+                var lowest = 0;
+                $(elms).each(function(index){
+                    if ($(this)) {    
+                        var itemDom = this;
+                        var total = $(this).position().top + this.offsetHeight;
+                            if(total > lowest){
+                                lowest = total
+                            }
+                    }
+                });
+                return lowest
+            }
+            
             function infiniteScroll(scrollTop) {
                 if (scrollNs.isFull){
                     clearTimeout(scrollNs.loadViewTimeout)
@@ -322,7 +338,7 @@
                 if (scrollNs.isLoading || !scope.model.length) return
                 var containerInfo = getScrollContainerInfo();
                 var scrollHeight = containerInfo.scrollHeight
-                var contHeight = $("post").last().position().top;
+                var contHeight = findLowestElmPosition($("post").slice(-(options.pageSize)));
                 var containerHeight = containerInfo.height;
                 var target = (contHeight - ( options.infiniteScrollDistance * containerHeight));
                 if ( (scrollTop > target || (target < 0 && scrollTop < containerHeight)) && infiniteCount < options.infiniteCountMax) {
@@ -339,7 +355,7 @@
                     scrollNs.isFull = true
                 }
                 var lastItem = $("post").last()[0];
-                element.css('height', ($("post").last().position().top + lastItem.offsetHeight + 50 )+ 'px');
+                element.css('height', (findLowestElmPosition($("post").slice(-(options.pageSize))) + 50 )+ 'px');
                 if (!scrollNs.isFull && !scrollNs.stillRender) {
                     scrollNs.loadViewTimeout = setTimeout(function(){infiniteScroll(scrollTop)}, options.infiniteScrollDelay);
                 }
@@ -348,7 +364,7 @@
             
             scrollNs.initScroll = function() {
                 var container = getScrollContainerInfo();
-                var bottomPos = $("post").last().position().top
+                var bottomPos = findLowestElmPosition($("post").slice(-(options.pageSize)))
                     scrollNs.loadViewTimeout = setTimeout(function()
                         {
                             if (container.height > bottomPos) {
@@ -367,15 +383,16 @@
             function renderImages() {
               clearTimeout(scrollNs.stillRender);
               scrollNs.stillRender = setTimeout( function(){
-                $('.angular-grid-thumbnail').attr('src','#');
                 $('.angular-grid-thumbnail').each(function(index){
                       if(isElementInSelectedViewport(this)){
                           if (this.src != this.dataset.imgsrc) {
                               this.src = this.dataset.imgsrc;
                           }
+                      }else{
+                        this.src = options.placeHolder;
                       }
                   });
-                }, 400 );
+                }, 500 );
             }
             //scroll event on scroll container element to refresh dom depending on scroll positions
             function scrollHandler() {
